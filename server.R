@@ -45,30 +45,21 @@ houseg<- house %>% select(Status,Area,Type,SoldPrice) %>%
 # Basement Data Preparation
 #-------------------------------------------------------------------------------
 a<- house %>% filter(Type %in% c("Detached","Semi-Detached","Townhouse"))
-b<-dplyr::filter(a, grepl('Finished|Unfinished', Basement))
-c<-b
-c$Basement<-sub("Finished*","Finished",c$Basement)
+c<-a
 unique(c$Basement)
 unique(fulldata$Garage)
 unique(fulldata$Feature)
-#partial replacement   * replace any
-#strings<-"PO00081"
-#sub("PO000.", "", strings)
-#c$Basement<- mapvalues(c$Basement, from=c("Fin W/O, Finished","Apartment, Finished","Finished, Unfinished","Finished, Part Bsmt","Finished, Part Fin,"Finished, Half","Finished, Walk-Up"), to=c("Finished"))
 
 sum(is.na(fulldata$Basement))/nrow(fulldata)
 sum(is.na(fulldata$Feature))/nrow(fulldata)
 sum(is.na(fulldata$Garage))/nrow(fulldata)
 
-c$Basement[c$Basement %in% c("Finished, Sep Entrance","Fin W/O, Finished","Finished, W/O","Crawl Space, Finished","Finished, None","Finished, Full" , "Finished, Part Bsmt","Finished, Part Fin","Finished, Half","Finished, Walk-Up","Full, Finished","Finished, Finished" , "Finished, Other","Finished, Fin W/O" ,"Finished, Crawl Space")]<-"Finished"
-c$Basement[c$Basement %in% c("Full, Unfinished","Unfinished, W/O","Sep Entrance, Unfinished","Half, Unfinished" ,"Part Bsmt, Unfinished","None, Unfinished","Part Fin, Unfinished","Unfinished, Walk-Up","Crawl Space, Unfinished","Fin W/O, Unfinished" ,"Other, Unfinished", "Unfinished, Full","Unfinished, Sep Entrance")]<-"Unfinished"
-unique(c$Basement)
-
 houseb <- c %>% mutate(PriceDifference=SoldPrice-ListPrice) %>% 
   select(Basement,SoldPrice) %>% 
   group_by(Basement) %>% 
   dplyr::summarise(AverageSoldPrice=mean(SoldPrice),count=n())
-housec <- houseb %>% filter(Basement %in% c("Finished","Unfinished"))
+housec <- houseb %>% 
+  filter(Basement %in% c("Apartment","Finished","Part Finished","Unfinished"))
 
 
 #-------------------------------------------------------------------------------
